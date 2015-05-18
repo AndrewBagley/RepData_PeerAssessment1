@@ -227,3 +227,4 @@ activityData <- read.csv("activity.csv")
       layout=c(1,2)
   )
   ```
+  
