@@ -1,16 +1,12 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 ## Loading and preprocessing the data
 ######From Instructions:
 ######Show any code that is needed to
 ###### 1. Load the data (i.e. read.csv())
 
-```{r echo=TRUE}
+
+```r
 activityData <- read.csv("activity.csv")
 ```
 ###### 2. Process/transform the data (if necessary) into a format suitable for your analysis
@@ -22,13 +18,15 @@ activityData <- read.csv("activity.csv")
 
 - Creating dataset containing the total number of steps taken each day:
 
-  ```{r echo=TRUE}
+  
+  ```r
   dailyStepSum <- aggregate(activityData$steps, list(activityData$date), sum)
   colnames(dailyStepSum) <- c("Date", "Steps")
   ```
   
 - Creating histogram of the daily step data:
-  ```{r fig.width=15, echo=TRUE, tidy=FALSE}
+  
+  ```r
   with(dailyStepSum, {
       par(oma=c(2,0,0,0), mar=c(6.75,6.75,3,0), mgp=c(5.75,0.75,0), las=2)
       barplot(
@@ -42,22 +40,28 @@ activityData <- read.csv("activity.csv")
   })
   ```
   
+  ![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+  
 ###### 2. Calculate and report the mean and median total number of steps taken per day
 - Calculate the mean and median values (ignoring NA values):
 
   1. Mean
-      ```{r echo=TRUE}
+      
+      ```r
       dailyStepMean <- mean(dailyStepSum$Steps, na.rm=TRUE)
       ```
-      ```{r echo=FALSE}
-      print(dailyStepMean)
+      
+      ```
+      ## [1] 10766.19
       ```
   2. Median
-      ```{r echo=TRUE}
+      
+      ```r
       dailyStepMedian <- median(dailyStepSum$Steps, na.rm=TRUE)
       ```
-      ```{r echo=FALSE}
-      print(dailyStepMedian)
+      
+      ```
+      ## [1] 10765
       ```
 
 ## What is the average daily activity pattern?
@@ -65,7 +69,8 @@ activityData <- read.csv("activity.csv")
 ######What is the average daily activity pattern?
 ###### 1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
   
-  ```{r echo=TRUE, tidy=FALSE}
+  
+  ```r
   intervalSteps <- aggregate(
       data=activityData,
       steps~interval,
@@ -75,7 +80,8 @@ activityData <- read.csv("activity.csv")
   colnames(intervalSteps) <- c("Interval", "AvgStepsAvgAcrossDay")
   ```
 
-  ```{r fig.width=15, echo=TRUE, tidy=FALSE}
+  
+  ```r
   with(intervalSteps, {
       plot(
         x=Interval,
@@ -88,17 +94,22 @@ activityData <- read.csv("activity.csv")
       )
   })
   ```
+  
+  ![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
 
 ###### 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 - Calculate Interval Max
-  ```{r echo=TRUE, tidy=FALSE}
+  
+  ```r
   intervalMax <- intervalSteps[intervalSteps$AvgStepsAvgAcrossDay==max(intervalSteps$AvgStepsAvgAcrossDay),]
   ```
 - Interval Max:
-  ```{r echo=FALSE}
-  print(intervalMax)
+  
   ```
-- The interval between **`r as.character(intervalMax[1])`** and  **`r as.character(as.numeric(intervalMax[1])+5)`** minutes has the maximum number of steps.
+  ##     Interval AvgStepsAvgAcrossDay
+  ## 104      835             206.1698
+  ```
+- The interval between **835** and  **840** minutes has the maximum number of steps.
 
 
 ## Inputing missing values
@@ -106,11 +117,13 @@ activityData <- read.csv("activity.csv")
 ###### 1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
 - Total number of rows with NA values in original data.
 
-  ```{r echo=TRUE}
+  
+  ```r
   countNA <- nrow(subset(activityData, is.na(activityData$steps)))
   ```
-  ```{r echo=FALSE}
-  print(countNA)
+  
+  ```
+  ## [1] 2304
   ```
 
 ###### 2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
@@ -118,7 +131,8 @@ activityData <- read.csv("activity.csv")
 
 - Decimal values will be rounded up to a whole number.
  
-  ```{r echo=TRUE, tidy=FALSE}
+  
+  ```r
   stepValues <- data.frame(activityData$steps)
   stepValues[is.na(stepValues),] <- ceiling(tapply(X=activityData$steps,INDEX=activityData$interval,FUN=mean,na.rm=TRUE))
   newData <- cbind(stepValues, activityData[,2:3])
@@ -128,20 +142,42 @@ activityData <- read.csv("activity.csv")
 ###### 3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 - The total number of steps taken each day is generated using this new dataset.
 
-  ```{r echo=TRUE}
+  
+  ```r
   newDailyStepSum <- aggregate(newData$Steps, list(newData$Date), sum)
   colnames(newDailyStepSum) <- c("Date", "Steps")
   ```
    A portion of the new dataset is as follows:
-  ```{r echo=FALSE}
-
-  print(newDailyStepSum[1:20,])
+  
+  ```
+  ##          Date Steps
+  ## 1  2012-10-01 10909
+  ## 2  2012-10-02   126
+  ## 3  2012-10-03 11352
+  ## 4  2012-10-04 12116
+  ## 5  2012-10-05 13294
+  ## 6  2012-10-06 15420
+  ## 7  2012-10-07 11015
+  ## 8  2012-10-08 10909
+  ## 9  2012-10-09 12811
+  ## 10 2012-10-10  9900
+  ## 11 2012-10-11 10304
+  ## 12 2012-10-12 17382
+  ## 13 2012-10-13 12426
+  ## 14 2012-10-14 15098
+  ## 15 2012-10-15 10139
+  ## 16 2012-10-16 15084
+  ## 17 2012-10-17 13452
+  ## 18 2012-10-18 10056
+  ## 19 2012-10-19 11829
+  ## 20 2012-10-20 10395
   ```
 
 ###### 4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 - A histogram of the above data is created as a form of visual representation.
 
-  ```{r fig.width=15, echo=TRUE, tidy=FALSE}
+  
+  ```r
   with(newDailyStepSum, {
       par(oma=c(2,0,0,0), mar=c(6.75,6.75,3,0), mgp=c(5.75,0.75,0), las=2)
       barplot(
@@ -154,32 +190,38 @@ activityData <- read.csv("activity.csv")
       )
   })
   ```
+  
+  ![](PA1_template_files/figure-html/unnamed-chunk-17-1.png) 
 
 - Calculate the mean and median values of this new dataset (NA values replaced with mean).
 
   1. Mean
-      ```{r echo=TRUE}
+      
+      ```r
       newDailyStepMean <- mean(newDailyStepSum$Steps)
       ```
-      ```{r echo=FALSE}
-      print(newDailyStepMean)
+      
+      ```
+      ## [1] 10784.92
       ```
   2. Median
-      ```{r echo=TRUE}
+      
+      ```r
       newDailyStepMedian <- median(newDailyStepSum$Steps)
       ```
-      ```{r echo=FALSE}
-      print(newDailyStepMedian)
+      
+      ```
+      ## [1] 10909
       ```
       
 - Calculating the mean for the NA values has caused both the mean and median values to increase.
 
   1. Mean:
   
-      `r as.character(floor(as.numeric(dailyStepMean)))` to `r as.character(floor(as.numeric(newDailyStepMean)))`
+      10766 to 10784
   2. Median:
   
-      `r as.character(floor(as.numeric(dailyStepMedian)))` to `r as.character(floor(as.numeric(newDailyStepMedian)))`
+      10765 to 10909
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
@@ -189,7 +231,8 @@ activityData <- read.csv("activity.csv")
 
 1.  Add a new column indicating whether the date is a weekday or a weekend dataset created in the previous section.
 
-  ```{r echo=TRUE}
+  
+  ```r
   dateDayType <- data.frame(sapply(X=newData$Date, FUN=function(day) {
     if (weekdays(as.Date(day)) %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")) {
       day <- "weekday"
@@ -205,17 +248,19 @@ activityData <- read.csv("activity.csv")
 
 2. Seperate the data into weekday or weekend and the mean (average) number of steps taken for each 5-minute interval.
 
-  ```{r echo=TRUE, tidy=FALSE}
+  
+  ```r
   dayTypeIntervalSteps <- aggregate(
       data=newDataWithDayType,
       Steps ~ DayType + Interval,
       FUN=mean
   )
-  ```  
+  ```
 
 3. Create a panel plot of both weekend and weekday graphs.
 
-  ```{r fig.width=15, echo=TRUE, tidy=FALSE}
+  
+  ```r
   library("lattice")
   
   xyplot(
@@ -227,3 +272,5 @@ activityData <- read.csv("activity.csv")
       layout=c(1,2)
   )
   ```
+  
+  ![](PA1_template_files/figure-html/unnamed-chunk-24-1.png) 
